@@ -7,18 +7,15 @@ from imutils import face_utils
 from imutils.video import VideoStream
 
 import BlinkDetector
+import PursedLipsDetector
 
 SHAPE_PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
 FILE_VIDEO_STREAM_PATH = ""
 
-# eye aspect ratio to indicate blink (if the EAR falls below this value)
-EYE_ASPECT_RATIO_THRESHOLD = 0.19
-# the number of consecutive frames the eye must be below the threshold
-EYE_ASPECT_RATIO_CONSECUTIVE_FRAMES = 2
-
 
 def process():
     blinkDetector = BlinkDetector.BlinkDetector()
+    pursedLipsDetector = PursedLipsDetector.PursedLipsDetector()
 
     # loop over frames from the video stream
     while True:
@@ -29,7 +26,7 @@ def process():
 
         # get the frame from the threaded video file stream, resize it, and convert it to grayscale
         frame = video_stream.read()
-        frame = imutils.resize(frame, width=450)
+        frame = imutils.resize(frame, width=650)
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # detect faces in the grayscale frame
@@ -43,6 +40,7 @@ def process():
             shape = face_utils.shape_to_np(shape)
 
             blinkDetector.detect_blinks(frame, shape)
+            pursedLipsDetector.detect(frame, shape)
 
         # show the frame
         cv2.imshow("Blinks detector", frame)
@@ -59,8 +57,8 @@ if __name__ == "__main__":
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
 
-    # vs = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
-    # fileStream = True
+    # video_stream = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
+    # file_stream = True
     video_stream = VideoStream(src=0).start()
     file_stream = False
     time.sleep(1.0)

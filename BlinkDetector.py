@@ -2,19 +2,21 @@ import cv2
 from imutils import face_utils
 from scipy.spatial import distance
 
-from main import EYE_ASPECT_RATIO_CONSECUTIVE_FRAMES, EYE_ASPECT_RATIO_THRESHOLD
-
 
 class BlinkDetector:
-    # grab the indexes of the facial landmarks for the left and right eye
+    # indexes of the facial landmarks for the left and right eye
     (left_eye_start, left_eye_end) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (right_eye_start, right_eye_end) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-    def __init__(self):
+    def __init__(self, eye_aspect_ratio_threshold = 0.19, blink_consecutive_frames=2):
         # number of blinks per frame
         self.frame_blink_counter = 0
         # total number of blinks
         self.total_blink_counter = 0
+        # eye aspect ratio to indicate blink (if the EAR falls below this value)
+        self.EYE_ASPECT_RATIO_THRESHOLD = eye_aspect_ratio_threshold
+        # the number of consecutive frames the eye must be below the threshold
+        self.BLINK_CONSECUTIVE_FRAMES = blink_consecutive_frames
 
     def detect_blinks(self, frame, shape):
         # extract the left and right eye coordinates, then use the
@@ -29,13 +31,13 @@ class BlinkDetector:
 
         # check to see if the eye aspect ratio is below the blink
         # threshold, and if so, increment the blink frame counter
-        if EAR < EYE_ASPECT_RATIO_THRESHOLD:
+        if EAR < self.EYE_ASPECT_RATIO_THRESHOLD:
             self.frame_blink_counter += 1
 
         else:
             # if the eyes were closed for a sufficient number of frames
             # then increment the total number of blinks
-            if self.frame_blink_counter >= EYE_ASPECT_RATIO_CONSECUTIVE_FRAMES:
+            if self.frame_blink_counter >= self.BLINK_CONSECUTIVE_FRAMES:
                 self.total_blink_counter += 1
 
             # reset the eye frame counter
@@ -68,10 +70,10 @@ class BlinkDetector:
         cv2.drawContours(frame, [right_eye_hull], -1, (0, 255, 0), 1)
 
     @staticmethod
-    def print_blinks(frame, blinks, EAR):
+    def print_blinks(frame, blinks, EAR=-1):
         # print the total number of blinks on the frame along with
         # the computed eye aspect ratio for the frame
         cv2.putText(frame, "Blinks: {}".format(blinks), (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-        cv2.putText(frame, "EAR: {:.4f}".format(EAR), (300, 30),
+        cv2.putText(frame, "EAR: {:.4f}".format(EAR), (200, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
