@@ -8,7 +8,7 @@ from imutils.video import VideoStream
 from scipy.spatial import distance
 
 SHAPE_PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
-FILE_VIDEOSTREAM_PATH = ""
+FILE_VIDEO_STREAM_PATH = ""
 
 # eye aspect ratio to indicate blink (if the EAR falls below this value)
 EYE_ASPECT_RATIO_THRESHOLD = 0.19
@@ -32,6 +32,23 @@ def eye_aspect_ratio(eye):
     return EAR
 
 
+def draw_eyes(frame, left_eye, right_eye):
+    # compute the convex hull for the left and right eye and visualize each of the eyes
+    left_eye_hull = cv2.convexHull(left_eye)
+    right_eye_hull = cv2.convexHull(right_eye)
+    cv2.drawContours(frame, [left_eye_hull], -1, (0, 255, 0), 1)
+    cv2.drawContours(frame, [right_eye_hull], -1, (0, 255, 0), 1)
+
+
+def print_blinks(frame, blinks, EAR):
+    # print the total number of blinks on the frame along with
+    # the computed eye aspect ratio for the frame
+    cv2.putText(frame, "Blinks: {}".format(blinks), (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(frame, "EAR: {:.4f}".format(EAR), (300, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+
 def process():
     # initialize the frame counters and the total number of blinks
     frame_blink_counter = 0
@@ -52,52 +69,43 @@ def process():
         # get the frame from the threaded video file stream, resize it, and convert it to grayscale
         frame = video_stream.read()
         frame = imutils.resize(frame, width=450)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # detect faces in the grayscale frame and process the first one
-        face = detector(gray, 0)[0]
+        # detect faces in the grayscale frame
+        faces = detector(gray_frame, 0)
 
-        # determine the facial landmarks for the face region, then
-        # convert the facial landmark (x, y)-coordinates to a NumPy array
-        shape = predictor(gray, face)
-        shape = face_utils.shape_to_np(shape)
+        if faces and faces[0]:
+            face = faces[0]
+            # determine the facial landmarks for the face region, then
+            # convert the facial landmark (x, y)-coordinates to a NumPy array
+            shape = predictor(gray_frame, face)
+            shape = face_utils.shape_to_np(shape)
 
-        # extract the left and right eye coordinates, then use the
-        # coordinates to compute the eye aspect ratio for both eyes
-        left_eye = shape[left_eye_start:left_eye_end]
-        right_eye = shape[right_eye_start:right_eye_end]
-        left_EAR = eye_aspect_ratio(left_eye)
-        right_EAR = eye_aspect_ratio(right_eye)
+            # extract the left and right eye coordinates, then use the
+            # coordinates to compute the eye aspect ratio for both eyes
+            left_eye = shape[left_eye_start:left_eye_end]
+            right_eye = shape[right_eye_start:right_eye_end]
+            left_EAR = eye_aspect_ratio(left_eye)
+            right_EAR = eye_aspect_ratio(right_eye)
+            EAR = (left_EAR + right_EAR) / 2.0
 
-        # average the eye aspect ratio together for both eyes
-        EAR = (left_EAR + right_EAR) / 2.0
+            draw_eyes(frame, left_eye, right_eye)
 
-        # compute the convex hull for the left and right eye and visualize each of the eyes
-        left_eye_hull = cv2.convexHull(left_eye)
-        right_eye_hull = cv2.convexHull(right_eye)
-        cv2.drawContours(frame, [left_eye_hull], -1, (0, 255, 0), 1)
-        cv2.drawContours(frame, [right_eye_hull], -1, (0, 255, 0), 1)
+            # check to see if the eye aspect ratio is below the blink
+            # threshold, and if so, increment the blink frame counter
+            if EAR < EYE_ASPECT_RATIO_THRESHOLD:
+                frame_blink_counter += 1
 
-        # check to see if the eye aspect ratio is below the blink
-        # threshold, and if so, increment the blink frame counter
-        if EAR < EYE_ASPECT_RATIO_THRESHOLD:
-            frame_blink_counter += 1
+            else:
+                # if the eyes were closed for a sufficient number of frames
+                # then increment the total number of blinks
+                if frame_blink_counter >= EYE_ASPECT_RATIO_CONSECUTIVE_FRAMES:
+                    total_blink_counter += 1
 
-        else:
-            # if the eyes were closed for a sufficient number of frames
-            # then increment the total number of blinks
-            if frame_blink_counter >= EYE_ASPECT_RATIO_CONSECUTIVE_FRAMES:
-                total_blink_counter += 1
+                # reset the eye frame counter
+                frame_blink_counter = 0
 
-            # reset the eye frame counter
-            frame_blink_counter = 0
-
-            # print the total number of blinks on the frame along with
-            # the computed eye aspect ratio for the frame
-            cv2.putText(frame, "Blinks: {}".format(total_blink_counter), (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            cv2.putText(frame, "EAR: {:.4f}".format(EAR), (300, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                print_blinks(frame, total_blink_counter, EAR)
 
         # show the frame
         cv2.imshow("Blinks detector", frame)
@@ -114,8 +122,7 @@ if __name__ == "__main__":
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
 
-    # args["video"]
-    # vs = FileVideoStream(FILE_VIDEOSTREAM_PATH).start()
+    # vs = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
     # fileStream = True
     video_stream = VideoStream(src=0).start()
     file_stream = False
