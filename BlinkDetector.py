@@ -18,11 +18,11 @@ class BlinkDetector:
         # the number of consecutive frames the eye must be below the threshold
         self.BLINK_CONSECUTIVE_FRAMES = blink_consecutive_frames
 
-    def detect_blinks(self, frame, shape):
+    def detect(self, frame, face_region):
         # extract the left and right eye coordinates, then use the
         # coordinates to compute the eye aspect ratio for both eyes
-        left_eye = shape[self.left_eye_start:self.left_eye_end]
-        right_eye = shape[self.right_eye_start:self.right_eye_end]
+        left_eye = face_region[self.left_eye_start:self.left_eye_end]
+        right_eye = face_region[self.right_eye_start:self.right_eye_end]
         left_EAR = self.eye_aspect_ratio(left_eye)
         right_EAR = self.eye_aspect_ratio(right_eye)
         EAR = (left_EAR + right_EAR) / 2.0

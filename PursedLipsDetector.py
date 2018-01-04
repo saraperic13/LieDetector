@@ -17,12 +17,13 @@ class PursedLipsDetector:
         # the number of consecutive frames the lips must be below the threshold
         self.PURSED_LIPS_CONSECUTIVE_FRAMES = pursed_lips_consecutive_frames
 
-    def detect(self, frame, shape):
+    def detect(self, frame, face_region):
         # extract the mouth coordinates, then use the
-        # coordinates to compute the mouth aspect ratio for
-        mouth = shape[self.mouth_start:self.mouth_end]
-        inner_part_lips = shape[60:68]
-        outer_part_lips = shape[48:59]
+        # coordinates to compute the mouth aspect ratio
+        mouth = face_region[self.mouth_start:self.mouth_end]
+        inner_part_lips = face_region[60:68]
+        outer_part_lips = face_region[48:59]
+
         self.draw_mouth(frame, inner_part_lips, outer_part_lips)
 
         # calculate mouth aspect ratio
