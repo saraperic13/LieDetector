@@ -20,6 +20,8 @@ class BlushingDetector:
         # calculated average cheek color
         self.AVERAGE_CHEEK_COLOR = [0, 0, 0]
 
+        self.blushing_occurred_counter = 0
+
     def detect(self, frame, gray_frame, face_region):
         # extract the right and left cheek coordinates, then use the
         # coordinates to compute the average cheeks color
@@ -42,9 +44,12 @@ class BlushingDetector:
             print("BLUSHING")
             # reset the blushing frame counter
             self.blushing_frame_counter = 0
+            self.blushing_occurred_counter += 1
 
+        # if blushing is not detected in the current frame, but is detected in 20 previous ones,
+        # the counter shouldn't reset because this may occur due to sudden movement, or lighting change
         elif not blushing and self.blushing_frame_counter < 20:
-            # reset the pursed lips frame counter
+            # reset the blushing frame counter
             self.blushing_frame_counter = 0
 
     def is_blushing(self, temp_color):
@@ -63,6 +68,12 @@ class BlushingDetector:
     def set_average_cheek_color(self, average_cheek_color):
         # calculated average cheek color
         self.AVERAGE_CHEEK_COLOR = average_cheek_color
+
+    def get_number_of_blushing_occurred_and_reset(self):
+        retVal = self.blushing_occurred_counter
+        self.blushing_occurred_counter = 0
+        self.blushing_frame_counter = 0
+        return retVal
 
     @staticmethod
     def calculate_cheeks_color(frame, gray_frame, right_cheek, left_cheek):

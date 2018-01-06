@@ -8,24 +8,19 @@ class BlinkDetector:
     (left_eye_start, left_eye_end) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (right_eye_start, right_eye_end) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-    def __init__(self, eye_aspect_ratio_threshold = 0.19, blink_consecutive_frames=2):
+    def __init__(self):
         # number of blinks per frame
         self.frame_blink_counter = 0
         # total number of blinks
         self.total_blink_counter = 0
         # eye aspect ratio to indicate blink (if the EAR falls below this value)
-        self.EYE_ASPECT_RATIO_THRESHOLD = eye_aspect_ratio_threshold
+        self.EYE_ASPECT_RATIO_THRESHOLD = -1
         # the number of consecutive frames the eye must be below the threshold
-        self.BLINK_CONSECUTIVE_FRAMES = blink_consecutive_frames
+        self.BLINK_CONSECUTIVE_FRAMES = -1
 
     def detect(self, frame, face_region):
-        # extract the left and right eye coordinates, then use the
-        # coordinates to compute the eye aspect ratio for both eyes
-        left_eye = face_region[self.left_eye_start:self.left_eye_end]
-        right_eye = face_region[self.right_eye_start:self.right_eye_end]
-        left_EAR = self.eye_aspect_ratio(left_eye)
-        right_EAR = self.eye_aspect_ratio(right_eye)
-        EAR = (left_EAR + right_EAR) / 2.0
+
+        EAR, left_eye, right_eye = self.calculate_eye_aspect_ratio(face_region)
 
         self.draw_eyes(frame, left_eye, right_eye)
 
@@ -44,6 +39,27 @@ class BlinkDetector:
             self.frame_blink_counter = 0
 
             self.print_blinks(frame, self.total_blink_counter, EAR)
+
+    def calculate_eye_aspect_ratio_threshold(self, eye_aspect_ratio):
+        self.EYE_ASPECT_RATIO_THRESHOLD = eye_aspect_ratio * 0.7
+        self.BLINK_CONSECUTIVE_FRAMES = 1
+
+    def get_and_reset_number_of_blinks(self):
+        retVal = self.total_blink_counter
+        self.frame_blink_counter = 0
+        self.total_blink_counter = 0
+        return retVal
+
+    @staticmethod
+    def calculate_eye_aspect_ratio(face_region):
+        # extract the left and right eye coordinates, then use the
+        # coordinates to compute the eye aspect ratio for both eyes
+        left_eye = face_region[BlinkDetector.left_eye_start:BlinkDetector.left_eye_end]
+        right_eye = face_region[BlinkDetector.right_eye_start:BlinkDetector.right_eye_end]
+
+        left_EAR = BlinkDetector.eye_aspect_ratio(left_eye)
+        right_EAR = BlinkDetector.eye_aspect_ratio(right_eye)
+        return (left_EAR + right_EAR) / 2.0, left_eye, right_eye
 
     @staticmethod
     def eye_aspect_ratio(eye):
@@ -75,5 +91,5 @@ class BlinkDetector:
         # the computed eye aspect ratio for the frame
         cv2.putText(frame, "Blinks: {}".format(blinks), (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-        cv2.putText(frame, "EAR: {:.4f}".format(EAR), (200, 30),
+        cv2.putText(frame, "EAR: {:.4f}".format(EAR), (200, 40),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
