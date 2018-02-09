@@ -255,3 +255,36 @@ Person averaged
 	number of pursing occurred:  9
 
 	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.16855337906712467
+	EAR: 0.30073193822
+	LAR: 0.134466572059
+	lip pursing: 0
+	cheek color: 148, 98, 99
+
+1. Detected:
+	blinks detected: 6
+	number of blinks per second: 0.16855337906712467
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 0
+	number of blinks per second: 0.0
+	number of blushing occurred:  0
+	number of pursing occurred:  1
+
+	Predicted:  lie
+
+3. Detected:
+	blinks detected: 1
+	number of blinks per second: 0.4499493387758167
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth

@@ -14,7 +14,7 @@ import kNN
 
 SHAPE_PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
 FILE_VIDEO_STREAM_PATH = "../dataset/08.mp4"
-DATASET_PATH = '../files/datasetExtracted.csv'
+DATASET_PATH = 'files/datasetExtracted.csv'
 
 NUMBER_OF_FRAMES_TO_INSPECT = 100
 NUMBER_OF_FRAMES_TO_INSPECT_EYES = 25
@@ -38,10 +38,10 @@ class LieDetector:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
 
-        self.video_stream = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
-        self.file_stream = True
-        # self.video_stream = VideoStream(src=0).start()
-        # self.file_stream = False
+        # self.video_stream = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
+        # self.file_stream = True
+        self.video_stream = VideoStream(src=0).start()
+        self.file_stream = False
         time.sleep(1.0)
 
     def process(self):
