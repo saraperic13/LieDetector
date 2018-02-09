@@ -1,0 +1,257 @@
+
+
+******************************************************
+03 Person averaged
+	blinks: 1
+	number of blinks per second: 0.0669784608823024
+	EAR: 0.315515392805
+	LAR: 0.152148638035
+	lip pursing: 0
+	cheek color: 184, 129, 114
+
+1. Detected:
+	blinks detected: 11
+	number of blinks per second: 0.0669784608823024
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 38
+	number of blinks per second: 0.11466793251065269
+	number of blushing occurred:  0
+	number of pursing occurred:  3
+
+	Predicted:  lie
+
+3. Detected:
+	blinks detected: 18
+	number of blinks per second: 0.09768266397757688
+	number of blushing occurred:  0
+	number of pursing occurred:  4
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.0744471802542235
+	EAR: 0.311644987903
+	LAR: 0.170732081852
+	lip pursing: 0
+	cheek color: 173, 117, 103
+
+1. Detected:
+	blinks detected: 16
+	number of blinks per second: 0.0744471802542235
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 5
+	number of blinks per second: 0.07066447921649346
+	number of blushing occurred:  0
+	number of pursing occurred:  2
+
+	Predicted:  lie
+
+3. Detected:
+	blinks detected: 8
+	number of blinks per second: 0.06357004688432366
+	number of blushing occurred:  0
+	number of pursing occurred:  1
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.18163709612886222
+	EAR: 0.299746505161
+	LAR: 0.151279011282
+	lip pursing: 0
+	cheek color: 177, 125, 110
+
+1. Detected:
+	blinks detected: 39
+	number of blinks per second: 0.18163709612886222
+	number of blushing occurred:  1
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 27
+	number of blinks per second: 0.23725742750447695
+	number of blushing occurred:  0
+	number of pursing occurred:  1
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.08164851296796768
+	EAR: 0.34519203324
+	LAR: 0.15929026769
+	lip pursing: 0
+	cheek color: 198, 137, 109
+
+1. Detected:
+	blinks detected: 22
+	number of blinks per second: 0.08164851296796768
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 25
+	number of blinks per second: 0.08896534702858395
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+3. Detected:
+	blinks detected: 15
+	number of blinks per second: 0.10085077258403541
+	number of blushing occurred:  0
+	number of pursing occurred:  6
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.19409628229949855
+	EAR: 0.342810282862
+	LAR: 0.148165803443
+	lip pursing: 0
+	cheek color: 184, 125, 103
+
+1. Detected:
+	blinks detected: 45
+	number of blinks per second: 0.19409628229949855
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 31
+	number of blinks per second: 0.22308076373004754
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+3. Detected:
+	blinks detected: 14
+	number of blinks per second: 0.10950096189145378
+	number of blushing occurred:  0
+	number of pursing occurred:  7
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.08614070578492031
+	EAR: 0.35748768117
+	LAR: 0.162159223789
+	lip pursing: 6
+	cheek color: 207, 165, 149
+
+1. Detected:
+	blinks detected: 23
+	number of blinks per second: 0.08614070578492031
+	number of blushing occurred:  0
+	number of pursing occurred:  6
+
+	Predicted:  lie
+
+2. Detected:
+	blinks detected: 17
+	number of blinks per second: 0.07748070836453635
+	number of blushing occurred:  0
+	number of pursing occurred:  18
+
+	Predicted:  lie
+
+3. Detected:
+	blinks detected: 18
+	number of blinks per second: 0.12729596348030003
+	number of blushing occurred:  0
+	number of pursing occurred:  15
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 0
+	number of blinks per second: 0.06138977113822747
+	EAR: 0.375195770606
+	LAR: 0.180193661244
+	lip pursing: 0
+	cheek color: 206, 130, 92
+
+1. Detected:
+	blinks detected: 17
+	number of blinks per second: 0.06138977113822747
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 35
+	number of blinks per second: 0.14721190959212527
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+3. Detected:
+	blinks detected: 16
+	number of blinks per second: 0.09110868612999723
+	number of blushing occurred:  0
+	number of pursing occurred:  6
+
+	Predicted:  lie
+
+******************************************************
+Person averaged
+	blinks: 1
+	number of blinks per second: 0.09633247425749646
+	EAR: 0.415546006516
+	LAR: 0.174671800914
+	lip pursing: 0
+	cheek color: 189, 141, 120
+
+1. Detected:
+	blinks detected: 24
+	number of blinks per second: 0.09633247425749646
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+2. Detected:
+	blinks detected: 13
+	number of blinks per second: 0.08456631570115516
+	number of blushing occurred:  0
+	number of pursing occurred:  2
+
+	Predicted:  lie
+
+4. Detected:
+	blinks detected: 20
+	number of blinks per second: 0.11448132411533964
+	number of blushing occurred:  0
+	number of pursing occurred:  9
+
+	Predicted:  lie

@@ -1,17 +1,25 @@
 import csv
-import random
 import math
 import operator
+import random
 
 
-def load_dataset(filename, split, trainingSet=[], testSet=[]):
-    with open(filename, 'rb') as csv_file:
-        lines = csv.reader(csv_file)
+def load_dataset(filename, training=False, trainingSet=[], testSet=[]):
+    with open(filename, 'rt') as csvfile:
+        next(csv.reader(csvfile))
+        lines = csv.reader(csvfile)
         dataset = list(lines)
+
+        if training:
+            split = 0.7 * len(dataset)
+            # random.shuffle(dataset)
+        else:
+            split = len(dataset)
+
         for x in range(len(dataset) - 1):
-            for y in range(4):
+            for y in range(5):
                 dataset[x][y] = float(dataset[x][y])
-            if random.random() < split:
+            if len(trainingSet) <= split:
                 trainingSet.append(dataset[x])
             else:
                 testSet.append(dataset[x])
@@ -55,7 +63,7 @@ def calculate_votes(neighbors):
             class_votes[response] += 1
         else:
             class_votes[response] = 1
-    sorted_votes = sorted(class_votes.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sorted_votes = sorted(class_votes.items(), key=operator.itemgetter(1), reverse=True)
     return sorted_votes[0][0]
 
 
@@ -67,22 +75,31 @@ def calculate_accuracy(testSet, predictions):
     return (correct / float(len(testSet))) * 100.0
 
 
-def predict(data_set_path, k=3):
+def predict(to_predict, data_set_path, k=3, training=False):
     training_set = []
     test_set = []
-    split = 0.67
-    load_dataset(data_set_path, split, training_set, test_set)
-    print('Train set: ' + repr(len(training_set)))
-    print('Test set: ' + repr(len(training_set)))
-    
+
     predictions = []
 
-    for x in range(len(test_set)):
-        neighbors = get_neighbors(training_set, test_set[x], k)
-        result = calculate_votes(neighbors)
-        predictions.append(result)
-        print('> predicted=' + repr(result) + ', actual=' + repr(test_set[x][-1]))
+    load_dataset(data_set_path, training, training_set, test_set)
 
-    accuracy = calculate_accuracy(test_set, predictions)
-    print('Accuracy: ' + repr(accuracy) + '%')
+    if training:
+        for x in range(len(test_set)):
+            neighbors = get_neighbors(training_set, test_set[x], k)
+            result = calculate_votes(neighbors)
+            predictions.append(result)
+            print('> predicted=' + repr(result) + ', actual=' + repr(test_set[x][-1]))
 
+        accuracy = calculate_accuracy(test_set, predictions)
+        print('Accuracy: ' + repr(accuracy) + '%')
+    else:
+        for x in range(len(to_predict)):
+            neighbors = get_neighbors(training_set, to_predict[x], k)
+            result = calculate_votes(neighbors)
+            predictions.append(result)
+            print('> predicted=' + repr(result))
+
+    return predictions
+
+
+# predict([[0.6333, 0.8333, 0, 0, 0]], "../files/datasetExtracted.csv", k=3)

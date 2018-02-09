@@ -4,18 +4,20 @@ import cv2
 import dlib
 import imutils
 from imutils import face_utils
-from imutils.video import VideoStream
+from imutils.video import VideoStream, FileVideoStream
 
 import BlinkDetector
 import BlushingDetector
 import Person
 import PursedLipsDetector
+import kNN
 
 SHAPE_PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
-FILE_VIDEO_STREAM_PATH = ""
+FILE_VIDEO_STREAM_PATH = "../dataset/08.mp4"
+DATASET_PATH = '../files/datasetExtracted.csv'
 
-NUMBER_OF_FRAMES_TO_INSPECT = 200
-NUMBER_OF_FRAMES_TO_INSPECT_EYES = 30
+NUMBER_OF_FRAMES_TO_INSPECT = 100
+NUMBER_OF_FRAMES_TO_INSPECT_EYES = 25
 
 
 class LieDetector:
@@ -28,6 +30,7 @@ class LieDetector:
         self.blushing_detector = BlushingDetector.BlushingDetector()
         self.person = Person.Person()
         self.questions_counter = 1
+        self.seconds = 0
 
     def initialize(self):
         # initialize dlib's face detector (HOG-based) and then create
@@ -35,23 +38,25 @@ class LieDetector:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
 
-        # self.video_stream = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
-        # self.file_stream = True
-        self.video_stream = VideoStream(src=0).start()
-        self.file_stream = False
+        self.video_stream = FileVideoStream(FILE_VIDEO_STREAM_PATH).start()
+        self.file_stream = True
+        # self.video_stream = VideoStream(src=0).start()
+        # self.file_stream = False
         time.sleep(1.0)
 
     def process(self):
 
+        timeBefore = time.time()
         # loop over frames from the video stream
         while True:
+
             # if this is a file video stream, check if there are any more frames left in the buffer to process
             if self.file_stream and not self.video_stream.more():
                 break
 
             # get the frame from the threaded video file stream, resize it, and convert it to grayscale
             frame = self.video_stream.read()
-            frame = imutils.resize(frame, width=650)
+            frame = imutils.resize(frame, width=800)
             gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             self.frame_counter += 1
@@ -87,7 +92,8 @@ class LieDetector:
                     # calculate average cheek color
                     self.calculate_average_cheek_color(frame, gray_frame, face_region)
 
-                elif self.frame_counter < NUMBER_OF_FRAMES_TO_INSPECT + 3:
+                elif self.frame_counter == NUMBER_OF_FRAMES_TO_INSPECT:
+                    print("SET AVERAGE VALUES")
                     # set values of interest to the respective detectors
                     self.blushing_detector.set_average_cheek_color(self.person.average_cheek_color)
 
@@ -96,6 +102,8 @@ class LieDetector:
                     self.person.set_average_number_of_lip_pursing(
                         self.pursed_lips_detector.get_and_reset_number_of_lip_pursing())
                     print(self.person.average_cheek_color)
+                    print(self.person.average_number_of_blinks)
+                    print(self.person.average_number_of_lip_pursing)
 
                 # detect blinks, lip pursing and blushing
                 else:
@@ -112,12 +120,23 @@ class LieDetector:
             cv2.imshow("Lie detector", frame)
 
             key = cv2.waitKey(1) & 0xFF
-            # if the `q` key was pressed, break from the loop
-            if key == ord("q"):
+
+            if key == ord("x"):
                 break
+
             elif key == ord("n"):
+
+                # calculate number of seconds
+                now = time.time()
+                self.seconds = now - timeBefore
                 self.detect_if_lie()
+
                 self.questions_counter += 1
+                timeBefore = time.time()
+
+        now = time.time()
+        self.seconds = now - timeBefore
+        self.detect_if_lie()
 
     def calculate_average_cheek_color(self, frame, gray_frame, face_region):
         left_cheek = face_region[self.blushing_detector.left_cheek_idx]
@@ -139,14 +158,30 @@ class LieDetector:
         number_of_blinks = self.blink_detector.get_and_reset_number_of_blinks()
         number_of_blushing_occurred = self.blushing_detector.get_number_of_blushing_occurred_and_reset()
         number_of_lip_pursing_occurred = self.pursed_lips_detector.get_and_reset_number_of_lip_pursing()
-        self.write_to_file(number_of_blinks, number_of_blushing_occurred, number_of_lip_pursing_occurred)
 
-    def write_to_file(self, number_of_blinks, number_of_blushing_occurred, number_of_lip_pursing_occurred):
+        if self.seconds > 0:
+            number_of_blinks_per_second = number_of_blinks/self.seconds
+
+        print("NUMBER OF BLINKS PER SEC: " + str(number_of_blinks_per_second))
+
+        to_predict = [number_of_blinks_per_second, number_of_lip_pursing_occurred, number_of_blushing_occurred]
+        prediction = kNN.predict([to_predict], DATASET_PATH)
+
+        self.write_to_file(number_of_blinks, number_of_blushing_occurred,
+                           number_of_lip_pursing_occurred, number_of_blinks_per_second, prediction)
+
+        # reset seconds counter
+        self.seconds = 0
+
+    def write_to_file(self, number_of_blinks, number_of_blushing_occurred, number_of_lip_pursing_occurred,
+                      number_of_blinks_per_second, prediction):
         # write report
         file = open("report.txt", "a")
         if self.questions_counter == 1:
+            file.write("\n\n******************************************************\n")
             file.write("Person averaged")
             file.write("\n\tblinks: " + str(self.person.average_number_of_blinks))
+            file.write("\n\tnumber of blinks per second: " + str(number_of_blinks_per_second))
             file.write("\n\tEAR: " + str(self.person.eye_aspect_ratio))
             file.write("\n\tLAR: " + str(self.person.lips_aspect_ratio))
             file.write("\n\tlip pursing: " + str(number_of_lip_pursing_occurred))
@@ -156,8 +191,10 @@ class LieDetector:
 
         file.write("\n\n" + str(self.questions_counter) + ". Detected:")
         file.write("\n\tblinks detected: " + str(number_of_blinks))
+        file.write("\n\tnumber of blinks per second: " + str(number_of_blinks_per_second))
         file.write("\n\tnumber of blushing occurred:  " + str(number_of_blushing_occurred))
         file.write("\n\tnumber of pursing occurred:  " + str(number_of_lip_pursing_occurred))
+        file.write("\n\n\tPredicted:  " + prediction[0])
 
         file.close()
 
