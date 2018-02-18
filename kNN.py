@@ -1,10 +1,12 @@
 import csv
 import math
 import operator
-import random
+
+training_set = []
+test_set = []
 
 
-def load_dataset(filename, training=False, trainingSet=[], testSet=[]):
+def load_dataset(filename, training=False):
     with open(filename, 'rt') as csvfile:
         next(csv.reader(csvfile))
         lines = csv.reader(csvfile)
@@ -12,22 +14,23 @@ def load_dataset(filename, training=False, trainingSet=[], testSet=[]):
 
         if training:
             split = 0.7 * len(dataset)
-            # random.shuffle(dataset)
         else:
             split = len(dataset)
 
         for x in range(len(dataset) - 1):
             for y in range(5):
                 dataset[x][y] = float(dataset[x][y])
-            if len(trainingSet) <= split:
-                trainingSet.append(dataset[x])
+            if len(training_set) <= split:
+                training_set.append(dataset[x])
             else:
-                testSet.append(dataset[x])
+                test_set.append(dataset[x])
 
 
 """
  Calculates Euclidean distance between two instances.
 """
+
+
 def euclidean_distance(instance1, instance2, number_of_params):
     distance = 0
     for param in range(number_of_params):
@@ -38,6 +41,8 @@ def euclidean_distance(instance1, instance2, number_of_params):
 """
  Finds k nearest neighbours of an instance from training dataset.
 """
+
+
 def get_neighbors(trainingSet, instance, k):
     distances = []
     length = len(instance) - 1
@@ -55,6 +60,8 @@ def get_neighbors(trainingSet, instance, k):
  Return predicted class by getting the majority voted response from a number of neighbors,
  by allowing each neighbor to vote for their class attribute.
 """
+
+
 def calculate_votes(neighbors):
     class_votes = {}
     for i in range(len(neighbors)):
@@ -76,12 +83,10 @@ def calculate_accuracy(testSet, predictions):
 
 
 def predict(to_predict, data_set_path, k=3, training=False):
-    training_set = []
-    test_set = []
-
     predictions = []
 
-    load_dataset(data_set_path, training, training_set, test_set)
+    if len(training_set) == 0:
+        load_dataset(data_set_path, training)
 
     if training:
         for x in range(len(test_set)):
@@ -102,4 +107,4 @@ def predict(to_predict, data_set_path, k=3, training=False):
     return predictions
 
 
-# predict([[0.6333, 0.8333, 0, 0, 0]], "../files/datasetExtracted.csv", k=3)
+# predict([[0.6333, 0.8333, 0, 0, 0]], "../files/datasetExtracted.csv", k=1, training=True)

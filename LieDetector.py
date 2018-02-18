@@ -13,7 +13,7 @@ import PursedLipsDetector
 import kNN
 
 SHAPE_PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
-FILE_VIDEO_STREAM_PATH = "../dataset/08.mp4"
+FILE_VIDEO_STREAM_PATH = "../dataset/03.mp4"
 DATASET_PATH = 'files/datasetExtracted.csv'
 
 NUMBER_OF_FRAMES_TO_INSPECT = 100
@@ -162,8 +162,6 @@ class LieDetector:
         if self.seconds > 0:
             number_of_blinks_per_second = number_of_blinks/self.seconds
 
-        print("NUMBER OF BLINKS PER SEC: " + str(number_of_blinks_per_second))
-
         to_predict = [number_of_blinks_per_second, number_of_lip_pursing_occurred, number_of_blushing_occurred]
         prediction = kNN.predict([to_predict], DATASET_PATH)
 
@@ -176,7 +174,7 @@ class LieDetector:
     def write_to_file(self, number_of_blinks, number_of_blushing_occurred, number_of_lip_pursing_occurred,
                       number_of_blinks_per_second, prediction):
         # write report
-        file = open("report.txt", "a")
+        file = open("test.txt", "a")
         if self.questions_counter == 1:
             file.write("\n\n******************************************************\n")
             file.write("Person averaged")

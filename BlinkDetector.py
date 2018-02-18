@@ -38,7 +38,7 @@ class BlinkDetector:
             # reset the eye frame counter
             self.frame_blink_counter = 0
 
-            self.print_blinks(frame, self.total_blink_counter, EAR)
+        self.print_blinks(frame, self.total_blink_counter, EAR)
 
     def calculate_eye_aspect_ratio_threshold(self, eye_aspect_ratio):
         self.EYE_ASPECT_RATIO_THRESHOLD = eye_aspect_ratio * 0.7
