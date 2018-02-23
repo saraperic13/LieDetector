@@ -18,7 +18,7 @@ def load_dataset(filename, training=False):
             split = len(dataset)
 
         for x in range(len(dataset) - 1):
-            for y in range(5):
+            for y in range(4):
                 dataset[x][y] = float(dataset[x][y])
             if len(training_set) <= split:
                 training_set.append(dataset[x])
@@ -107,4 +107,4 @@ def predict(to_predict, data_set_path, k=3, training=False):
     return predictions
 
 
-# predict([[0.6333, 0.8333, 0, 0, 0]], "../files/datasetExtracted.csv", k=1, training=True)
+# predict([[0.6333, 0.8333, 0, 0, 0]], "files/datasetExtracted.csv", k=3, training=False)

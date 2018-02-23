@@ -7,9 +7,9 @@ class Person:
         self.average_number_of_blinks = 0
         self.average_number_of_lip_pursing = 0
 
-    def set_average_number_of_blinks(self, num):
-        if num > 0:
-            self.average_number_of_blinks = num
+    def set_average_number_of_blinks(self, num, seconds = 1):
+        if num > 0 and seconds > 0:
+            self.average_number_of_blinks = num/seconds
 
     def set_average_cheek_color(self, cheek_color):
         self.average_cheek_color = cheek_color

@@ -97,8 +97,9 @@ class LieDetector:
                     # set values of interest to the respective detectors
                     self.blushing_detector.set_average_cheek_color(self.person.average_cheek_color)
 
+                    now = time.time()
                     # set average number of blinks and lip pursing to the person
-                    self.person.set_average_number_of_blinks(self.blink_detector.get_and_reset_number_of_blinks())
+                    self.person.set_average_number_of_blinks(self.blink_detector.get_and_reset_number_of_blinks(), now-timeBefore)
                     self.person.set_average_number_of_lip_pursing(
                         self.pursed_lips_detector.get_and_reset_number_of_lip_pursing())
                     print(self.person.average_cheek_color)
@@ -161,8 +162,10 @@ class LieDetector:
 
         if self.seconds > 0:
             number_of_blinks_per_second = number_of_blinks/self.seconds
+        else:
+            number_of_blinks_per_second = number_of_blinks
 
-        to_predict = [number_of_blinks_per_second, number_of_lip_pursing_occurred, number_of_blushing_occurred]
+        to_predict = [self.person.average_number_of_blinks, number_of_blinks_per_second, number_of_lip_pursing_occurred, number_of_blushing_occurred]
         prediction = kNN.predict([to_predict], DATASET_PATH)
 
         self.write_to_file(number_of_blinks, number_of_blushing_occurred,
