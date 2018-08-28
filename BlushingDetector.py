@@ -38,7 +38,7 @@ class BlushingDetector:
             self.blushing_frame_counter += 1
             print("BLU " + str(self.blushing_frame_counter))
 
-        # if the blushing stayed for a sufficient number of frames
+        # if the blushing continued for a sufficient number of frames
         if self.blushing_frame_counter >= self.BLUSHING_CONSECUTIVE_FRAMES:
             self.print_blushing(frame)
             print("BLUSHING")

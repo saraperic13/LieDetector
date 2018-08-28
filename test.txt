@@ -1,0 +1,58 @@
+
+
+******************************************************
+Person averaged
+	blinks: 0.40191362948253817
+	number of blinks per second: 0.12870163758969186
+	EAR: 0.3141628872279366
+	LAR: 0.14534475159536953
+	lip pursing: 0
+	cheek color: 140, 64, 58
+
+1. Detected:
+	blinks detected: 4
+	number of blinks per second: 0.12870163758969186
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  lie
+
+2. Detected:
+	blinks detected: 3
+	number of blinks per second: 0.3653855635946943
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+3. Detected:
+	blinks detected: 4
+	number of blinks per second: 0.36091662133127234
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+4. Detected:
+	blinks detected: 3
+	number of blinks per second: 0.4512857267974643
+	number of blushing occurred:  0
+	number of pursing occurred:  0
+
+	Predicted:  truth
+
+5. Detected:
+	blinks detected: 1
+	number of blinks per second: 0.2369286466587376
+	number of blushing occurred:  0
+	number of pursing occurred:  1
+
+	Predicted:  lie
+
+6. Detected:
+	blinks detected: 75
+	number of blinks per second: 0.3632766951200699
+	number of blushing occurred:  0
+	number of pursing occurred:  21
+
+	Predicted:  lie

@@ -1,9 +1,22 @@
 import csv
 import math
 import operator
+from random import shuffle
 
 training_set = []
 test_set = []
+
+def cross_validation():
+    for k in range(1, len(training_set) - 1):
+        acc = 0
+        for i in range(len(training_set)):
+            to_predict = training_set[i]
+            training_set.remove(to_predict)
+            predictions = fit([to_predict], training_set, k)
+            acc += calculate_accuracy([to_predict], predictions)
+            training_set.insert(i, to_predict)
+
+        print("k = %2d" % (k), " Tačnost: ", acc / len(training_set))
 
 
 def load_dataset(filename, training=False):
@@ -12,12 +25,14 @@ def load_dataset(filename, training=False):
         lines = csv.reader(csvfile)
         dataset = list(lines)
 
+        shuffle(dataset)
+
         if training:
-            split = 0.7 * len(dataset)
+            split = 0.8 * len(dataset)
         else:
             split = len(dataset)
 
-        for x in range(len(dataset) - 1):
+        for x in range(len(dataset)):
             for y in range(4):
                 dataset[x][y] = float(dataset[x][y])
             if len(training_set) <= split:
@@ -82,29 +97,31 @@ def calculate_accuracy(testSet, predictions):
     return (correct / float(len(testSet))) * 100.0
 
 
-def predict(to_predict, data_set_path, k=3, training=False):
+def fit(to_predict, dataset, k):
     predictions = []
-
-    if len(training_set) == 0:
-        load_dataset(data_set_path, training)
-
-    if training:
-        for x in range(len(test_set)):
-            neighbors = get_neighbors(training_set, test_set[x], k)
-            result = calculate_votes(neighbors)
-            predictions.append(result)
-            print('> predicted=' + repr(result) + ', actual=' + repr(test_set[x][-1]))
-
-        accuracy = calculate_accuracy(test_set, predictions)
-        print('Accuracy: ' + repr(accuracy) + '%')
-    else:
-        for x in range(len(to_predict)):
-            neighbors = get_neighbors(training_set, to_predict[x], k)
-            result = calculate_votes(neighbors)
-            predictions.append(result)
-            print('> predicted=' + repr(result))
+    for x in range(len(to_predict)):
+        neighbors = get_neighbors(dataset, to_predict[x], k)
+        result = calculate_votes(neighbors)
+        predictions.append(result)
+        print('> predicted=' + repr(result))
 
     return predictions
 
 
-# predict([[0.6333, 0.8333, 0, 0, 0]], "files/datasetExtracted.csv", k=3, training=False)
+def predict(to_predict, data_set_path, k=12, training=False):
+    if len(training_set) == 0:
+        load_dataset(data_set_path, training)
+
+    # cross_validation()
+
+    if training:
+        predictions = fit(test_set, training_set, k)
+        accuracy = calculate_accuracy(test_set, predictions)
+        print('Accuracy: ' + repr(accuracy) + '%')
+    else:
+        predictions = fit(to_predict, training_set, k)
+
+    return predictions
+
+
+# predict([[0.6333, 0.4333, 1, 0]], "files/datasetExtracted.csv", k=12, training=False)

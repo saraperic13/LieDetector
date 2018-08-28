@@ -5,24 +5,27 @@ import dlib
 import imutils
 from imutils import face_utils
 from imutils.video import VideoStream, FileVideoStream
+import numpy as np
 
 import BlinkDetector
 import BlushingDetector
 import Person
 import PursedLipsDetector
 import kNN
+import feedforward_nn
 
 SHAPE_PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
 FILE_VIDEO_STREAM_PATH = "../dataset/03.mp4"
 DATASET_PATH = 'files/datasetExtracted.csv'
 
-NUMBER_OF_FRAMES_TO_INSPECT = 100
+NUMBER_OF_FRAMES_TO_INSPECT = 200
 NUMBER_OF_FRAMES_TO_INSPECT_EYES = 25
 
 
 class LieDetector:
 
-    def __init__(self):
+    def __init__(self, algorithm):
+        self.algorithm = algorithm
         self.initialize()
         self.frame_counter = 0
         self.blink_detector = BlinkDetector.BlinkDetector()
@@ -75,7 +78,7 @@ class LieDetector:
                 if self.frame_counter < NUMBER_OF_FRAMES_TO_INSPECT:
 
                     if self.frame_counter < NUMBER_OF_FRAMES_TO_INSPECT_EYES:
-                        # calculate average eye and lips aspect ratio in the first couple of frames
+                        # calculate average eye and lips aspect ratio through the first couple of frames
                         self.calculate_eye_aspect_ratio(face_region)
                         self.calculate_lips_aspect_ratio(face_region)
 
@@ -99,7 +102,8 @@ class LieDetector:
 
                     now = time.time()
                     # set average number of blinks and lip pursing to the person
-                    self.person.set_average_number_of_blinks(self.blink_detector.get_and_reset_number_of_blinks(), now-timeBefore)
+                    self.person.set_average_number_of_blinks(self.blink_detector.get_and_reset_number_of_blinks(),
+                                                             now - timeBefore)
                     self.person.set_average_number_of_lip_pursing(
                         self.pursed_lips_detector.get_and_reset_number_of_lip_pursing())
                     print(self.person.average_cheek_color)
@@ -161,12 +165,25 @@ class LieDetector:
         number_of_lip_pursing_occurred = self.pursed_lips_detector.get_and_reset_number_of_lip_pursing()
 
         if self.seconds > 0:
-            number_of_blinks_per_second = number_of_blinks/self.seconds
+            number_of_blinks_per_second = number_of_blinks / self.seconds
         else:
             number_of_blinks_per_second = number_of_blinks
 
-        to_predict = [self.person.average_number_of_blinks, number_of_blinks_per_second, number_of_lip_pursing_occurred, number_of_blushing_occurred]
-        prediction = kNN.predict([to_predict], DATASET_PATH)
+        to_predict = [self.person.average_number_of_blinks, number_of_blinks_per_second, number_of_lip_pursing_occurred,
+                      number_of_blushing_occurred]
+
+        if self.algorithm == "knn":
+            prediction = kNN.predict([to_predict], DATASET_PATH)
+
+        else:
+            prediction = feedforward_nn.predict([to_predict])
+            print(prediction)
+
+        prediction = np.round(prediction[0])
+        if prediction == 1:
+            prediction = "truth"
+        else:
+            prediction = "lie"
 
         self.write_to_file(number_of_blinks, number_of_blushing_occurred,
                            number_of_lip_pursing_occurred, number_of_blinks_per_second, prediction)
@@ -195,7 +212,7 @@ class LieDetector:
         file.write("\n\tnumber of blinks per second: " + str(number_of_blinks_per_second))
         file.write("\n\tnumber of blushing occurred:  " + str(number_of_blushing_occurred))
         file.write("\n\tnumber of pursing occurred:  " + str(number_of_lip_pursing_occurred))
-        file.write("\n\n\tPredicted:  " + prediction[0])
+        file.write("\n\n\tPredicted:  " + prediction)
 
         file.close()
 
